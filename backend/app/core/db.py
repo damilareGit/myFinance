@@ -10,20 +10,30 @@ from __future__ import annotations
 
 import os
 from contextlib import asynccontextmanager
+from urllib.parse import urlsplit, urlunsplit
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from .models_base import Base
 
+
 def _normalize_database_url(url: str) -> str:
-    """Render (and most Postgres hosts) hand out a `postgres://` or
-    `postgresql://` connection string with no driver specified — that's the
-    sync psycopg format. Point it at asyncpg instead so it works with our
-    async engine, without requiring the host's dashboard to know about it."""
+    """Postgres hosts (Neon, Render, Supabase, ...) hand out a `postgres://`
+    or `postgresql://` connection string in the sync psycopg format, often
+    with `?sslmode=require` — that query param is psycopg-specific and
+    asyncpg raises `TypeError: unexpected keyword argument 'sslmode'` if it
+    reaches the driver. Point the scheme at asyncpg and strip the query
+    string; SSL is instead passed as a connect arg (see `_connect_args`),
+    since every managed Postgres host requires it regardless of what's in
+    the URL."""
     if url.startswith("postgres://"):
-        return "postgresql+asyncpg://" + url[len("postgres://"):]
-    if url.startswith("postgresql://"):
-        return "postgresql+asyncpg://" + url[len("postgresql://"):]
+        url = "postgresql+asyncpg://" + url[len("postgres://"):]
+    elif url.startswith("postgresql://"):
+        url = "postgresql+asyncpg://" + url[len("postgresql://"):]
+
+    if url.startswith("postgresql+asyncpg://"):
+        parts = urlsplit(url)
+        url = urlunsplit((parts.scheme, parts.netloc, parts.path, "", ""))
     return url
 
 
@@ -31,7 +41,9 @@ DATABASE_URL = _normalize_database_url(
     os.environ.get("DATABASE_URL", "sqlite+aiosqlite:///./finadvisor_dev.db")
 )
 
-engine = create_async_engine(DATABASE_URL, echo=False)
+_connect_args = {"ssl": True} if DATABASE_URL.startswith("postgresql+asyncpg://") else {}
+
+engine = create_async_engine(DATABASE_URL, echo=False, connect_args=_connect_args)
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
 

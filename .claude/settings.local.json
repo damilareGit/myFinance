@@ -53,7 +53,14 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:4321/login/)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:4321/dashboard/goals/)",
       "Bash(curl -s http://127.0.0.1:4321/login/)",
-      "Bash(taskkill //F //PID 26924)"
+      "Bash(taskkill //F //PID 26924)",
+      "Bash(git commit -m ' *)",
+      "Bash(git branch *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(python -c \"import secrets; print\\(secrets.token_hex\\(32\\)\\)\")",
+      "Bash(DATABASE_URL=postgresql://neondb_owner:npg_ZgnHk2i4AsIl@ep-cold-sunset-as56sx18.c-4.eu-central-1.aws.neon.tech/neondb?sslmode=require ./.venv/Scripts/python.exe -c ' *)",
+      "Bash(git add *)"
     ]
   }
 }
