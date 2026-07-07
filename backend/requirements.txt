@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pydantic[email]
+python-multipart
+pdfplumber
+sqlalchemy>=2.0
+aiosqlite
+asyncpg
+bcrypt
+python-jose[cryptography]

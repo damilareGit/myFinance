@@ -1,0 +1,21 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.db
+*.db-journal
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+
+# Env files — never commit real secrets
+.env
+.env.local
+!.env.example
+
+# Editor/OS
+.DS_Store
